@@ -44,5 +44,18 @@ namespace SmartTaskManagement.API.Services
             // Save project through repository
             return await _projectRepository.CreateAsync(project);
         }
+        public async Task<List<Project>> GetAllProjectsAsync()
+        {
+            return await _projectRepository.GetAllAsync();
+        }
+        public async Task<Project?> GetProjectByIdAsync(int projectId)
+        {
+            if (projectId <= 0)
+            {
+                throw new ArgumentException("Invalid project ID.");
+            }
+
+            return await _projectRepository.GetByIdAsync(projectId);
+        }
     }
 }

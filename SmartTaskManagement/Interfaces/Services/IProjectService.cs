@@ -7,5 +7,8 @@ namespace SmartTaskManagement.API.Interfaces.Services
     public interface IProjectService
     {
         Task<Project> CreateProjectAsync(CreateProjectDto projectDto);
+
+        Task<List<Project>> GetAllProjectsAsync();
+        Task<Project?> GetProjectByIdAsync(int projectId);
     }
 }

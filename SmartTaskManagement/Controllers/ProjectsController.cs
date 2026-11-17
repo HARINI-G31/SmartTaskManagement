@@ -38,6 +38,40 @@ namespace SmartTaskManagement.API.Controllers
                 });
             }
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllProjects()
+        {
+            var projects = await _projectService.GetAllProjectsAsync();
+
+            return Ok(projects);
+        }
+        [HttpGet("{id:int}")]
+        public async Task<IActionResult> GetProjectById(int id)
+        {
+            try
+            {
+                var project = await _projectService.GetProjectByIdAsync(id);
+
+                if (project == null)
+                {
+                    return NotFound(new
+                    {
+                        message = $"Project with ID {id} not found."
+                    });
+                }
+
+                return Ok(project);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new
+                {
+                    message = ex.Message
+                });
+            }
+        }
+
     }
 }
 

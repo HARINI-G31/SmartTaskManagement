@@ -18,10 +18,21 @@ namespace SmartTaskManagement.API.Repositories
         public async Task<Project> CreateAsync(Project project)
         {
             await _context.Projects.AddAsync(project);
-
             await _context.SaveChangesAsync();
-
             return project;
+        }
+
+        public async Task<List<Project>> GetAllAsync()
+        {
+            return await _context.Projects
+                .AsNoTracking()
+                .ToListAsync();
+        }
+        public async Task<Project?> GetByIdAsync(int projectId)
+        {
+            return await _context.Projects
+                .AsNoTracking()
+                .FirstOrDefaultAsync(p => p.ProjectId == projectId);
         }
     }
 }

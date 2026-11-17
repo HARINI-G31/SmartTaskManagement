@@ -1,0 +1,70 @@
+<div class="page-container">
+  <div class="page-header">
+    <div>
+      <h1>All Projects</h1>
+      <p>View and manage all your projects.</p>
+    </div>
+    <p>Loading: {{ isLoading }}</p>
+    <p>Projects Count: {{ projects.length }}</p>
+    <a routerLink="/projects/create" class="create-button"> + Create Project </a>
+  </div>
+
+  <div *ngIf="isLoading" class="loading">Loading projects...</div>
+
+  <div *ngIf="errorMessage" class="error-message">
+    {{ errorMessage }}
+  </div>
+
+  <div *ngIf="!isLoading && !errorMessage" class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Project Name</th>
+          <th>Description</th>
+          <th>Start Date</th>
+          <th>End Date</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let project of projects">
+          <td>{{ project.projectId }}</td>
+
+          <td>{{ project.projectName }}</td>
+
+          <td>{{ project.description || 'N/A' }}</td>
+
+          <td>{{ project.startDate | date: 'dd-MM-yyyy' }}</td>
+
+          <td>{{ project.endDate | date: 'dd-MM-yyyy' }}</td>
+
+          <td>
+            <span class="status">
+              {{
+                project.status === 1
+                  ? 'Planning'
+                  : project.status === 2
+                    ? 'In Progress'
+                    : project.status === 3
+                      ? 'On Hold'
+                      : project.status === 4
+                        ? 'Completed'
+                        : 'Cancelled'
+              }}
+            </span>
+          </td>
+          <td>
+            <a [routerLink]="['/projects', project.projectId]"> View Details </a>
+          </td>
+        </tr>
+
+        <tr *ngIf="projects.length === 0">
+          <td colspan="7" class="empty-message">No projects found.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
