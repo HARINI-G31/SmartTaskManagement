@@ -28,6 +28,22 @@ namespace SmartTaskManagement.API.Repositories
                 .AsNoTracking()
                 .ToListAsync();
         }
+        public async Task<(List<Project> Projects, int TotalCount)> GetPagedAsync(
+    int pageNumber,
+    int pageSize)
+        {
+            var query = _context.Projects.AsNoTracking();
+
+            var totalCount = await query.CountAsync();
+
+            var projects = await query
+                .OrderBy(p => p.ProjectId)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (projects, totalCount);
+        }
         public async Task<Project?> GetByIdAsync(int projectId)
         {
             return await _context.Projects

@@ -4,8 +4,7 @@
       <h1>All Projects</h1>
       <p>View and manage all your projects.</p>
     </div>
-    <p>Loading: {{ isLoading }}</p>
-    <p>Projects Count: {{ projects.length }}</p>
+
     <a routerLink="/projects/create" class="create-button"> + Create Project </a>
   </div>
 
@@ -32,13 +31,9 @@
       <tbody>
         <tr *ngFor="let project of projects">
           <td>{{ project.projectId }}</td>
-
           <td>{{ project.projectName }}</td>
-
           <td>{{ project.description || 'N/A' }}</td>
-
           <td>{{ project.startDate | date: 'dd-MM-yyyy' }}</td>
-
           <td>{{ project.endDate | date: 'dd-MM-yyyy' }}</td>
 
           <td>
@@ -56,12 +51,21 @@
               }}
             </span>
           </td>
-          <td>
-            <a [routerLink]="['/projects', project.projectId]"> View Details </a>
-            <br />
 
-            <a [routerLink]="['/projects/edit', project.projectId]"> Edit </a>
-            <button (click)="deleteProject(project.projectId)">Delete</button>
+          <td>
+            <div class="action-buttons">
+              <a [routerLink]="['/projects', project.projectId]" class="action-btn view-btn">
+                View Details
+              </a>
+
+              <a [routerLink]="['/projects/edit', project.projectId]" class="action-btn edit-btn">
+                Edit
+              </a>
+
+              <button class="action-btn delete-btn" (click)="deleteProject(project.projectId)">
+                Delete
+              </button>
+            </div>
           </td>
         </tr>
 
@@ -70,5 +74,27 @@
         </tr>
       </tbody>
     </table>
+
+    <!-- Pagination -->
+    <div class="pagination" *ngIf="totalCount > 0">
+      <p class="pagination-info">
+        Showing {{ (pageNumber - 1) * pageSize + 1 }}
+        -
+        {{ (pageNumber - 1) * pageSize + projects.length }}
+        of {{ totalCount }} projects
+      </p>
+
+      <div class="pagination-controls">
+        <button class="page-btn" (click)="previousPage()" [disabled]="pageNumber === 1">
+          Previous
+        </button>
+
+        <span class="page-number">{{ pageNumber }}</span>
+
+        <button class="page-btn" (click)="nextPage()" [disabled]="pageNumber === totalPages">
+          Next
+        </button>
+      </div>
+    </div>
   </div>
 </div>

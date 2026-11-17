@@ -46,6 +46,36 @@ namespace SmartTaskManagement.API.Controllers
 
             return Ok(projects);
         }
+        [HttpGet("paginated")]
+        public async Task<IActionResult> GetPagedProjects(
+    [FromQuery] int pageNumber = 1,
+    [FromQuery] int pageSize = 5)
+        {
+            try
+            {
+                var result = await _projectService.GetPagedProjectsAsync(
+                    pageNumber,
+                    pageSize
+                );
+
+                var response = new
+                {
+                    Projects = result.Projects,
+                    TotalCount = result.TotalCount,
+                    PageNumber = pageNumber,
+                    PageSize = pageSize,
+                    TotalPages = (int)Math.Ceiling(
+                        (double)result.TotalCount / pageSize
+                    )
+                };
+
+                return Ok(response);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetProjectById(int id)
         {

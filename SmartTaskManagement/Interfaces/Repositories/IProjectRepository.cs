@@ -8,6 +8,10 @@ namespace SmartTaskManagement.API.Interfaces.Repositories
         Task<Project> CreateAsync(Project project);
 
         Task<List<Project>> GetAllAsync();
+        Task<(List<Project> Projects, int TotalCount)> GetPagedAsync(
+    int pageNumber,
+    int pageSize
+);
         Task<Project?> GetByIdAsync(int projectId);
         Task<Project> UpdateAsync(Project project);
         Task DeleteAsync(Project project);

@@ -20,6 +20,13 @@ export interface Project {
   createdAt: string;
   updatedAt: string | null;
 }
+export interface PaginatedProjects {
+  projects: Project[];
+  totalCount: number;
+  pageNumber: number;
+  pageSize: number;
+  totalPages: number;
+}
 
 @Injectable({
   providedIn: 'root',
@@ -35,6 +42,11 @@ export class ProjectService {
 
   getAllProjects(): Observable<Project[]> {
     return this.http.get<Project[]>(this.apiUrl);
+  }
+  getPaginatedProjects(pageNumber: number, pageSize: number): Observable<PaginatedProjects> {
+    return this.http.get<PaginatedProjects>(
+      `${this.apiUrl}/paginated?pageNumber=${pageNumber}&pageSize=${pageSize}`,
+    );
   }
   getProjectById(projectId: number): Observable<Project> {
     return this.http.get<Project>(`${this.apiUrl}/${projectId}`);

@@ -113,3 +113,86 @@ tbody tr:hover {
 .create-button:hover {
   background-color: #1d4ed8;
 }
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.action-btn {
+  display: inline-block;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.view-btn {
+  background-color: #2563eb;
+}
+
+.edit-btn {
+  background-color: #f59e0b;
+}
+
+.delete-btn {
+  background-color: #dc2626;
+}
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  padding: 20px 10px;
+  margin-top: 15px;
+}
+
+.pagination-info {
+  color: #64748b;
+  font-size: 14px;
+  margin: 0;
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.page-btn {
+  padding: 9px 18px;
+  border: none;
+  border-radius: 6px;
+  background-color: #2563eb;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.page-btn:hover:not(:disabled) {
+  background-color: #1d4ed8;
+}
+
+.page-btn:disabled {
+  background-color: #cbd5e1;
+  color: #64748b;
+  cursor: not-allowed;
+}
+
+.page-number {
+  min-width: 38px;
+  padding: 9px 12px;
+  text-align: center;
+  border-radius: 6px;
+  background-color: #2563eb;
+  color: white;
+  font-weight: 600;
+}

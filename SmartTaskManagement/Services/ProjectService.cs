@@ -48,6 +48,22 @@ namespace SmartTaskManagement.API.Services
         {
             return await _projectRepository.GetAllAsync();
         }
+        public async Task<(List<Project> Projects, int TotalCount)> GetPagedProjectsAsync(
+    int pageNumber,
+    int pageSize)
+        {
+            if (pageNumber < 1)
+            {
+                throw new ArgumentException("Page number must be greater than zero.");
+            }
+
+            if (pageSize < 1 || pageSize > 100)
+            {
+                throw new ArgumentException("Page size must be between 1 and 100.");
+            }
+
+            return await _projectRepository.GetPagedAsync(pageNumber, pageSize);
+        }
         public async Task<Project?> GetProjectByIdAsync(int projectId)
         {
             if (projectId <= 0)
