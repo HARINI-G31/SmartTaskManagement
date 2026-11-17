@@ -10,5 +10,7 @@ namespace SmartTaskManagement.API.Interfaces.Services
 
         Task<List<Project>> GetAllProjectsAsync();
         Task<Project?> GetProjectByIdAsync(int projectId);
+        Task<Project> UpdateProjectAsync(int projectId, UpdateProjectDto projectDto);
+        Task DeleteProjectAsync(int projectId);
     }
 }

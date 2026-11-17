@@ -71,6 +71,54 @@ namespace SmartTaskManagement.API.Controllers
                 });
             }
         }
+        [HttpPut("{id:int}")]
+        public async Task<IActionResult> UpdateProject(
+    int id,
+    [FromBody] UpdateProjectDto projectDto)
+        {
+            try
+            {
+                var updatedProject =
+                    await _projectService.UpdateProjectAsync(id, projectDto);
+
+                return Ok(updatedProject);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new
+                {
+                    message = ex.Message
+                });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new
+                {
+                    message = ex.Message
+                });
+            }
+        }
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteProject(int id)
+        {
+            try
+            {
+                await _projectService.DeleteProjectAsync(id);
+
+                return Ok(new
+                {
+                    message = "Project deleted successfully."
+                });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+        }
 
     }
 }

@@ -58,6 +58,10 @@
           </td>
           <td>
             <a [routerLink]="['/projects', project.projectId]"> View Details </a>
+            <br />
+
+            <a [routerLink]="['/projects/edit', project.projectId]"> Edit </a>
+            <button (click)="deleteProject(project.projectId)">Delete</button>
           </td>
         </tr>
 

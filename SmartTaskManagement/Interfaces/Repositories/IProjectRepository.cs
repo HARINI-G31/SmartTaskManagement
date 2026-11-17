@@ -9,5 +9,7 @@ namespace SmartTaskManagement.API.Interfaces.Repositories
 
         Task<List<Project>> GetAllAsync();
         Task<Project?> GetByIdAsync(int projectId);
+        Task<Project> UpdateAsync(Project project);
+        Task DeleteAsync(Project project);
     }
 }

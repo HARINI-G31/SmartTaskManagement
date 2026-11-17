@@ -34,5 +34,18 @@ namespace SmartTaskManagement.API.Repositories
                 .AsNoTracking()
                 .FirstOrDefaultAsync(p => p.ProjectId == projectId);
         }
+        public async Task<Project> UpdateAsync(Project project)
+        {
+            _context.Projects.Update(project);
+
+            await _context.SaveChangesAsync();
+
+            return project;
+        }
+        public async Task DeleteAsync(Project project)
+        {
+            _context.Projects.Remove(project);
+            await _context.SaveChangesAsync();
+        }
     }
 }

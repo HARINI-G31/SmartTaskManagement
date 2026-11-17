@@ -57,5 +57,54 @@ namespace SmartTaskManagement.API.Services
 
             return await _projectRepository.GetByIdAsync(projectId);
         }
+        public async Task<Project> UpdateProjectAsync(
+    int projectId,
+    UpdateProjectDto projectDto)
+        {
+            if (projectId <= 0)
+            {
+                throw new ArgumentException("Invalid project ID.");
+            }
+
+            if (projectDto.StartDate > projectDto.EndDate)
+            {
+                throw new ArgumentException(
+                    "Start date cannot be later than end date.");
+            }
+
+            var existingProject =
+                await _projectRepository.GetByIdAsync(projectId);
+
+            if (existingProject == null)
+            {
+                throw new KeyNotFoundException(
+                    $"Project with ID {projectId} not found.");
+            }
+
+            existingProject.ProjectName = projectDto.ProjectName;
+            existingProject.Description = projectDto.Description;
+            existingProject.StartDate = projectDto.StartDate;
+            existingProject.EndDate = projectDto.EndDate;
+            existingProject.Status = projectDto.Status;
+            existingProject.UpdatedAt = DateTime.UtcNow;
+
+            return await _projectRepository.UpdateAsync(existingProject);
+        }
+        public async Task DeleteProjectAsync(int projectId)
+        {
+            if (projectId <= 0)
+            {
+                throw new ArgumentException("Invalid project ID.");
+            }
+
+            var project = await _projectRepository.GetByIdAsync(projectId);
+
+            if (project == null)
+            {
+                throw new KeyNotFoundException("Project not found.");
+            }
+
+            await _projectRepository.DeleteAsync(project);
+        }
     }
 }

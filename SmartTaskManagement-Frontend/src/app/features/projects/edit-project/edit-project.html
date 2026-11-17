@@ -1,0 +1,56 @@
+<div class="form-container">
+  <a routerLink="/projects" class="back-button">← Back to Projects</a>
+
+  <h1>Edit Project</h1>
+
+  <p *ngIf="isLoading">Loading project details...</p>
+
+  <div *ngIf="!isLoading">
+    <form (ngSubmit)="onSubmit()" #projectForm="ngForm">
+      <div class="form-group">
+        <label>Project Name</label>
+        <input
+          type="text"
+          name="projectName"
+          [(ngModel)]="project.projectName"
+          required
+          maxlength="150"
+        />
+      </div>
+
+      <div class="form-group">
+        <label>Description</label>
+        <textarea name="description" [(ngModel)]="project.description" maxlength="1000"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Start Date</label>
+        <input type="date" name="startDate" [(ngModel)]="project.startDate" required />
+      </div>
+
+      <div class="form-group">
+        <label>End Date</label>
+        <input type="date" name="endDate" [(ngModel)]="project.endDate" required />
+      </div>
+
+      <div class="form-group">
+        <label>Status</label>
+        <select name="status" [(ngModel)]="project.status">
+          <option [ngValue]="1">Planning</option>
+          <option [ngValue]="2">In Progress</option>
+          <option [ngValue]="3">On Hold</option>
+          <option [ngValue]="4">Completed</option>
+          <option [ngValue]="5">Cancelled</option>
+        </select>
+      </div>
+
+      <p *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+      </p>
+
+      <button type="submit" [disabled]="isSubmitting || projectForm.invalid">
+        {{ isSubmitting ? 'Updating...' : 'Update Project' }}
+      </button>
+    </form>
+  </div>
+</div>
