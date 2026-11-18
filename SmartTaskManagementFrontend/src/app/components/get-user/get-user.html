@@ -1,0 +1,46 @@
+<div class="get-user-container">
+
+  <h2>Get User By ID</h2>
+  <p>Enter a User ID to retrieve user details.</p>
+
+  <div class="search-section">
+
+    <input
+      type="text"
+      [(ngModel)]="userId"
+      placeholder="Enter User ID"
+    />
+
+    <button
+      type="button"
+      (click)="searchUser()"
+      [disabled]="isLoading"
+    >
+      {{ isLoading ? 'Searching...' : 'Search User' }}
+    </button>
+
+  </div>
+
+  @if (isLoading) {
+    <p>Loading user details...</p>
+  }
+
+  @if (errorMessage) {
+    <p class="error-message">{{ errorMessage }}</p>
+  }
+
+  @if (user) {
+    <div class="user-details">
+
+      <h3>User Details</h3>
+
+      <p><strong>ID:</strong> {{ user.id }}</p>
+      <p><strong>First Name:</strong> {{ user.firstName }}</p>
+      <p><strong>Last Name:</strong> {{ user.lastName }}</p>
+      <p><strong>Email:</strong> {{ user.email }}</p>
+      <p><strong>Role:</strong> {{ user.role }}</p>
+
+    </div>
+  }
+
+</div>

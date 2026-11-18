@@ -1,0 +1,75 @@
+
+<div class="user-container">
+
+  <h2>Registered Users</h2>
+
+  <button type="button" (click)="loadUsers()">
+    Refresh Users
+  </button>
+
+  @if (isLoading) {
+    <p>Loading users...</p>
+  }
+
+  @else if (errorMessage) {
+    <p class="error">{{ errorMessage }}</p>
+  }
+
+  @else {
+    <h3>Total Users: {{ users.length }}</h3>
+
+    <div class="search-controls">
+      <input
+        type="search"
+        [value]="searchTerm"
+        (input)="onSearchInput($event)"
+        placeholder="Search by Employee ID or Email"
+        aria-label="Search by Employee ID or Email"
+      />
+      @if (searchTerm) {
+        <button type="button" class="clear-search" (click)="clearSearch()">
+          Clear search
+        </button>
+      }
+    </div>
+
+    @if (filteredUsers.length > 0) {
+      <table>
+        <thead>
+          <tr>
+            <th>S.No</th>
+            <th>Employee ID</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Email</th>
+            <th>Role</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (user of filteredUsers; track user.id; let i = $index) {
+            <tr>
+              <td>{{ i + 1 }}</td>
+              <td>{{ user.id }}</td>
+              <td>{{ user.firstName }}</td>
+              <td>{{ user.lastName }}</td>
+              <td>{{ user.email }}</td>
+              <td>
+                @switch (user.role) {
+                  @case (0) { Admin }
+                  @case (1) { Manager }
+                  @case (2) { Employee }
+                  @default { Unknown }
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+    @else {
+      <p>No employees found</p>
+    }
+  }
+
+</div>

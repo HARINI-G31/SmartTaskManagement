@@ -1,0 +1,161 @@
+@if (user?.role === UserRole.Admin) {
+  <div class="dashboard-shell">
+    <aside class="sidebar">
+      <a class="brand" routerLink="/admin-dashboard">
+        <span class="brand-mark" aria-hidden="true">ST</span>
+        <span>SmartTask<span class="brand-light">Manage</span></span>
+      </a>
+
+      <p class="nav-label">WORKSPACE</p>
+      <nav class="side-nav" aria-label="Admin navigation">
+        <a class="nav-link active" routerLink="/admin-dashboard" aria-current="page">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5v9a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 19.5z"/><path d="M9 21v-8h6v8"/></svg>
+          <span>Dashboard</span>
+        </a>
+        <a class="nav-link" href="#employee-management">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span>Employee Management</span>
+        </a>
+        <a class="nav-link" routerLink="/users">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6m3-3h-6"/></svg>
+          <span>View Employees</span>
+        </a>
+        <a class="nav-link" routerLink="/user-create">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a6 6 0 0 1 12 0v2m4-11v8m4-4h-8"/></svg>
+          <span>Create Employee</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <a class="nav-link" href="#profile">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+          <span>Profile</span>
+        </a>
+        <button class="nav-link logout-link" type="button" (click)="logout()">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17l5-5-5-5m5 5H3"/><path d="M12 3h7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7"/></svg>
+          <span>Logout</span>
+        </button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">SMART TASK MANAGEMENT</p>
+          <h1>Admin Dashboard</h1>
+          <p class="welcome-message">
+            Welcome{{ user?.firstName ? ', ' + user.firstName : '' }}{{ user?.lastName ? ' ' + user.lastName : '' }}. Here's your workforce overview.
+          </p>
+        </div>
+        <div class="topbar-actions">
+          <span class="role-badge">Administrator</span>
+          <a class="profile-chip" id="profile" href="#profile" aria-label="Admin profile">
+            <span class="avatar" aria-hidden="true">{{ user?.firstName?.charAt(0) || 'A' }}</span>
+            <span class="profile-copy">
+              <strong>{{ user?.firstName }} {{ user?.lastName }}</strong>
+              <small>Admin profile</small>
+            </span>
+          </a>
+          <button class="top-logout" type="button" (click)="logout()">Logout</button>
+        </div>
+      </header>
+
+      <section class="overview" aria-labelledby="overview-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">AT A GLANCE</p>
+            <h2 id="overview-title">Dashboard Overview</h2>
+          </div>
+          <span class="data-source">Live employee data</span>
+        </div>
+
+        @if (errorMessage) {
+          <p class="error-message" role="alert">{{ errorMessage }}</p>
+        }
+
+        <div class="stats-grid">
+          <article class="stat-card stat-blue">
+            <div class="stat-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6m3-3h-6"/></svg>
+            </div>
+            <p>Total Employees</p>
+            <strong>{{ isLoading ? '...' : errorMessage ? '—' : totalEmployees }}</strong>
+            <small>Accounts in the employee directory</small>
+          </article>
+          <article class="stat-card stat-violet">
+            <div class="stat-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11z"/><path d="m9 12 2 2 4-4"/></svg>
+            </div>
+            <p>Total Admins</p>
+            <strong>{{ isLoading ? '...' : errorMessage ? '—' : totalAdmins }}</strong>
+            <small>Accounts with admin access</small>
+          </article>
+          <article class="stat-card stat-teal">
+            <div class="stat-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M5 21v-2a7 7 0 0 1 14 0v2m-7-7v7m-4-4h8"/></svg>
+            </div>
+            <p>Total Managers</p>
+            <strong>{{ isLoading ? '...' : errorMessage ? '—' : totalManagers }}</strong>
+            <small>Accounts with manager access</small>
+          </article>
+          <article class="stat-card stat-orange">
+            <div class="stat-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+            </div>
+            <p>Total Employee Accounts</p>
+            <strong>{{ isLoading ? '...' : errorMessage ? '—' : totalEmployeeAccounts }}</strong>
+            <small>Accounts with employee access</small>
+          </article>
+        </div>
+      </section>
+
+      <section class="management-section" id="employee-management" aria-labelledby="management-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">PEOPLE &amp; ACCESS</p>
+            <h2 id="management-title">Employee Management</h2>
+          </div>
+          <p class="section-description">Manage employee records and quickly find the information you need.</p>
+        </div>
+
+        <div class="actions-grid">
+          <a class="action-card primary-action" routerLink="/user-create">
+            <span class="action-icon" aria-hidden="true">+</span>
+            <span><strong>Create Employee</strong><small>Add a new account to the directory</small></span>
+            <span class="action-arrow" aria-hidden="true">→</span>
+          </a>
+          <a class="action-card" routerLink="/users">
+            <span class="action-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M3 5h18M3 12h18M3 19h18"/><circle cx="8" cy="5" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="10" cy="19" r="2"/></svg>
+            </span>
+            <span><strong>View All Employees</strong><small>Browse and manage employee records</small></span>
+            <span class="action-arrow" aria-hidden="true">→</span>
+          </a>
+          <a class="action-card" routerLink="/users">
+            <span class="action-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+            </span>
+            <span><strong>Search Employee</strong><small>Search by employee ID or email</small></span>
+            <span class="action-arrow" aria-hidden="true">→</span>
+          </a>
+          <a class="action-card" routerLink="/users">
+            <span class="action-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M20 7v5h-5"/><path d="M4 17v-5h5"/><path d="M5.6 9a7 7 0 0 1 11.6-2L20 12M4 12l2.8 5a7 7 0 0 0 11.6-2"/></svg>
+            </span>
+            <span><strong>Refresh Employees</strong><small>Reload the latest employee directory</small></span>
+            <span class="action-arrow" aria-hidden="true">→</span>
+          </a>
+        </div>
+      </section>
+    </main>
+  </div>
+} @else {
+  <main class="other-dashboard">
+    <section class="other-dashboard-card">
+      <p class="eyebrow">Smart Task Management</p>
+      <h1>{{ title }}</h1>
+      <p>Welcome{{ user?.firstName ? ', ' + user.firstName : '' }}.</p>
+      <button type="button" (click)="logout()">Sign out</button>
+    </section>
+  </main>
+}

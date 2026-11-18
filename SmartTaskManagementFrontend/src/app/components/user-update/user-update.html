@@ -1,0 +1,80 @@
+<div class="container">
+
+  <h2>Update User</h2>
+
+  <!-- Search User by ID -->
+
+  <div class="search-section">
+
+    <label>User ID</label>
+
+    <input
+      type="text"
+      [(ngModel)]="userId"
+      placeholder="Enter User ID"
+    />
+
+    <button type="button" (click)="loadUser()">
+      Load User
+    </button>
+
+  </div>
+
+  <p>{{ message }}</p>
+
+  <!-- Update User Form -->
+
+  @if (user) {
+
+    <form [formGroup]="userForm" (ngSubmit)="updateUser()">
+
+      <div>
+        <label>First Name</label>
+
+        <input
+          type="text"
+          formControlName="firstName"
+        />
+      </div>
+
+      <div>
+        <label>Last Name</label>
+
+        <input
+          type="text"
+          formControlName="lastName"
+        />
+      </div>
+
+      <div>
+        <label>Email</label>
+
+        <input
+          type="email"
+          formControlName="email"
+        />
+      </div>
+
+      <div>
+        <label>Role</label>
+
+        <select formControlName="role">
+
+          <option [ngValue]="UserRole.Admin">Admin</option>
+
+          <option [ngValue]="UserRole.Manager">Manager</option>
+
+          <option [ngValue]="UserRole.Employee">Employee</option>
+
+        </select>
+      </div>
+
+      <button type="submit">
+        Update User
+      </button>
+
+    </form>
+
+  }
+
+</div>
