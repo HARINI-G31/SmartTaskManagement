@@ -1,111 +1,144 @@
-
-import {
-  Component,
-  OnInit,
-  inject,
-  ChangeDetectorRef
-} from '@angular/core';
-
 import { HttpErrorResponse } from '@angular/common/http';
+import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 
+import { UserResponse, UserRole } from '../../models/user';
+import { AuthService } from '../../services/auth';
 import { UserService } from '../../services/user';
-import { UserResponse } from '../../models/user';
 
 @Component({
   selector: 'app-user-list',
   standalone: true,
-  imports: [],
+  imports: [FormsModule, RouterLink],
   templateUrl: './user-list.html',
   styleUrl: './user-list.css'
 })
 export class UserList implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly authService = inject(AuthService);
+  private readonly userService = inject(UserService);
 
-  // Inject UserService to communicate with the backend API
-  private userService = inject(UserService);
+  readonly UserRole = UserRole;
+  readonly pageSize = 10;
 
-  // Inject ChangeDetectorRef to refresh the component view
-  private cdr = inject(ChangeDetectorRef);
-
-  // Store all users received from the API
   users: UserResponse[] = [];
-
   searchTerm = '';
-
-  get filteredUsers(): UserResponse[] {
-    const query = this.searchTerm.trim().toLowerCase();
-
-    if (!query) {
-      return this.users;
-    }
-
-    return this.users.filter(user =>
-      user.id.toLowerCase().includes(query) ||
-      user.email.toLowerCase().includes(query)
-    );
-  }
-
-  onSearchInput(event: Event): void {
-    this.searchTerm = (event.target as HTMLInputElement).value;
-  }
-
-  clearSearch(): void {
-    this.searchTerm = '';
-  }
-
-  // Loading and error states
+  roleFilter: UserRole | 'all' = 'all';
+  currentPage = 1;
   isLoading = true;
   errorMessage = '';
+  successMessage = '';
+  deletingUserId: string | null = null;
 
-  // Automatically load users when the component initializes
-  ngOnInit(): void {
-    this.loadUsers();
+  get filteredUsers(): UserResponse[] {
+    const query = this.searchTerm.trim().toLocaleLowerCase();
+    return this.users.filter(user => {
+      const matchesSearch =
+        !query ||
+        [user.id, user.firstName, user.lastName, user.email].some(value =>
+          value.toLocaleLowerCase().includes(query)
+        );
+      return matchesSearch && (this.roleFilter === 'all' || user.role === this.roleFilter);
+    });
   }
 
-  // Fetch all users from the backend
+  get totalPages(): number {
+    return Math.max(1, Math.ceil(this.filteredUsers.length / this.pageSize));
+  }
+
+  get pagedUsers(): UserResponse[] {
+    const start = (this.currentPage - 1) * this.pageSize;
+    return this.filteredUsers.slice(start, start + this.pageSize);
+  }
+
+  ngOnInit(): void {
+    this.loadUsers();
+    this.userService.usersChanged$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.loadUsers());
+  }
+
   loadUsers(): void {
-
-    console.log('1. loadUsers() started');
-
     this.isLoading = true;
     this.errorMessage = '';
 
     this.userService.getUsers().subscribe({
-
-      // Executes when API returns successfully
-      next: (response: UserResponse[]) => {
-
-        console.log('2. API SUCCESS:', response);
-
-        this.users = response;
-
-        console.log('3. Users assigned:', this.users);
-        console.log('4. User count:', this.users.length);
-
+      next: users => {
+        this.users = users;
+        this.currentPage = Math.min(this.currentPage, this.totalPages);
         this.isLoading = false;
-
-        // Refresh the component view
-        this.cdr.detectChanges();
       },
-
-      // Executes when API request fails
       error: (error: HttpErrorResponse) => {
-
-        console.error('API ERROR:', error);
-
-        this.errorMessage = 'Unable to load users. Please try again.';
-
+        this.errorMessage = this.authService.getErrorMessage(
+          error,
+          'Unable to load employee records. Please try again.'
+        );
         this.isLoading = false;
-
-        this.cdr.detectChanges();
-      },
-
-      // Executes when the API request completes
-      complete: () => {
-        console.log('5. API request completed');
       }
-
     });
+  }
 
-    console.log('6. Subscription created');
+  onSearchChange(value: string): void {
+    this.searchTerm = value;
+    this.currentPage = 1;
+  }
+
+  onRoleFilterChange(event: Event): void {
+    const value = (event.target as HTMLSelectElement).value;
+    this.roleFilter = value === 'all' ? 'all' : Number(value) as UserRole;
+    this.currentPage = 1;
+  }
+
+  clearFilters(): void {
+    this.searchTerm = '';
+    this.roleFilter = 'all';
+    this.currentPage = 1;
+  }
+
+  roleName(role: UserRole): string {
+    switch (role) {
+      case UserRole.Admin:
+        return 'Admin';
+      case UserRole.Manager:
+        return 'Manager';
+      case UserRole.Employee:
+        return 'Employee';
+      default:
+        return 'Unknown';
+    }
+  }
+
+  deleteUser(user: UserResponse): void {
+    if (!window.confirm(`Delete the account for ${user.firstName} ${user.lastName}?`)) {
+      return;
+    }
+
+    this.deletingUserId = user.id;
+    this.errorMessage = '';
+    this.successMessage = '';
+    this.userService.deleteUser(user.id).subscribe({
+      next: () => {
+        this.deletingUserId = null;
+        this.successMessage = `${user.firstName} ${user.lastName} was deleted.`;
+        this.userService.notifyUsersChanged();
+      },
+      error: error => {
+        this.deletingUserId = null;
+        this.errorMessage = this.authService.getErrorMessage(
+          error,
+          'Unable to delete this account. Please try again.'
+        );
+      }
+    });
+  }
+
+  previousPage(): void {
+    this.currentPage = Math.max(1, this.currentPage - 1);
+  }
+
+  nextPage(): void {
+    this.currentPage = Math.min(this.totalPages, this.currentPage + 1);
   }
 }

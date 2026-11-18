@@ -90,6 +90,7 @@ export class UserDelete implements OnInit {
         );
 
         this.successMessage = 'User deleted successfully!';
+        this.userService.notifyUsersChanged();
 
         this.cdr.detectChanges();
 

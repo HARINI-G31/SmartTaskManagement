@@ -1,0 +1,22 @@
+:host{display:block;min-height:100vh;color:#172b4d;font:14px Inter,"Segoe UI",Arial,sans-serif}
+.app-shell{min-height:100vh;background:#f4f7fc}
+.sidebar{position:fixed;inset:0 auto 0 0;z-index:2;display:flex;width:252px;flex-direction:column;padding:25px 16px;background:#102542;color:#d7e1ef}
+.brand{display:flex;align-items:center;gap:11px;margin:0 5px 40px;color:#fff;text-decoration:none}
+.brand-mark,.avatar{display:grid;place-items:center;flex:none;width:38px;height:38px;border-radius:11px;background:#3478f6;color:#fff;font-weight:750}
+.brand-mark{font-size:12px}.brand-name{display:grid;gap:2px;font-size:15px;font-weight:700;letter-spacing:-.02em}.brand-name span{color:#aabbd2;font-size:11px;font-weight:500;letter-spacing:.02em}
+.nav-label,.eyebrow{margin:0;color:#8296b2;font-size:10px;font-weight:700;letter-spacing:.12em}.nav-label{padding:0 10px}
+.side-nav,.sidebar-bottom{display:grid;gap:6px}.side-nav{margin-top:12px}.sidebar-bottom{margin-top:auto;padding-top:14px;border-top:1px solid #293d59}
+.nav-link{display:flex;min-height:43px;align-items:center;gap:11px;padding:0 11px;border:0;border-radius:8px;background:transparent;color:#bcc9d9;cursor:pointer;font:inherit;font-size:12px;text-align:left;text-decoration:none;transition:background .16s ease,color .16s ease}
+.nav-link:hover,.nav-link.active{background:#1b365a;color:#fff}.nav-link.active{box-shadow:inset 3px 0 #5f98ff}.nav-link svg{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}.logout-link:hover{color:#ffc0c0}
+.workspace{max-width:1800px;min-height:100vh;margin-left:252px;padding:0 clamp(20px,4vw,56px) 48px}
+.topbar{display:flex;min-height:94px;align-items:center;justify-content:space-between;gap:20px;border-bottom:1px solid #e3eaf3}
+.page-heading h1{margin:7px 0 0;color:#172b4d;font-size:clamp(21px,2vw,27px);letter-spacing:-.025em}
+.account-actions,.account-link{display:flex;align-items:center;gap:12px}.account-link{color:inherit;text-decoration:none}
+.role-badge{padding:7px 10px;border:1px solid #d6e5ff;border-radius:20px;background:#edf4ff;color:#2d65bd;font-size:11px;font-weight:700}
+.avatar{width:38px;height:38px;border:1px solid #dbe8ff;border-radius:50%;background:#e8f0ff;color:#2d65bd;font-size:13px}
+.account-copy{display:grid;max-width:180px;gap:3px}.account-copy strong{overflow:hidden;color:#243651;font-size:12px;text-overflow:ellipsis;white-space:nowrap}.account-copy small{overflow:hidden;color:#78879c;font-size:10px;text-overflow:ellipsis;white-space:nowrap}
+.top-logout{padding:8px 11px;border:1px solid #dce5f0;border-radius:8px;background:#fff;color:#52647c;cursor:pointer;font:inherit;font-size:12px;transition:border-color .15s ease,color .15s ease}.top-logout:hover{border-color:#b9c9df;color:#1c3e6e}
+.page-content{padding-top:27px}
+@media(max-width:850px){.sidebar{width:215px}.workspace{margin-left:215px;padding-right:20px;padding-left:20px}.account-copy{display:none}}
+@media(max-width:650px){.sidebar{position:static;width:auto;padding:12px 14px}.brand{margin:0 4px 12px}.nav-label,.sidebar-bottom{display:none}.side-nav{display:flex;gap:4px;margin:0;overflow-x:auto}.nav-link{min-height:36px;flex:none;padding:0 9px;font-size:11px}.workspace{margin:0;padding:0 15px 28px}.topbar{min-height:76px}.account-actions{gap:8px}.role-badge{font-size:10px}.top-logout{padding:7px 9px}.page-content{padding-top:20px}}
+@media(max-width:420px){.topbar{align-items:flex-start;padding:15px 0}.account-actions{flex-wrap:wrap;justify-content:flex-end}.account-link{order:1}.role-badge{order:2}.top-logout{order:3}.account-copy{display:grid}.account-copy small{max-width:120px}.brand-name{font-size:13px}}

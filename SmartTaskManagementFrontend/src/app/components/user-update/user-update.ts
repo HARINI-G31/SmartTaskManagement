@@ -1,10 +1,11 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {
   ReactiveFormsModule,
   FormBuilder,
   Validators
 } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 
 import { UserService } from '../../services/user';
 import { UserResponse, UserRole, UpdateUser } from '../../models/user';
@@ -16,10 +17,11 @@ import { UserResponse, UserRole, UpdateUser } from '../../models/user';
   templateUrl: './user-update.html',
   styleUrl: './user-update.css'
 })
-export class UserUpdate {
+export class UserUpdate implements OnInit {
 
-  private fb = inject(FormBuilder);
-  private userService = inject(UserService);
+  private readonly fb = inject(FormBuilder);
+  private readonly route = inject(ActivatedRoute);
+  private readonly userService = inject(UserService);
 
   userId: string = '';
 
@@ -35,6 +37,14 @@ export class UserUpdate {
     email: ['', [Validators.required, Validators.email]],
     role: [UserRole.Employee, Validators.required]
   });
+
+  ngOnInit(): void {
+    const userId = this.route.snapshot.queryParamMap.get('userId');
+    if (userId) {
+      this.userId = userId;
+      this.loadUser();
+    }
+  }
 
   // GET: Load user details using ID
   loadUser(): void {
@@ -95,6 +105,7 @@ export class UserUpdate {
       next: (response: UserResponse) => {
         this.message = 'User updated successfully';
         this.user = response;
+        this.userService.notifyUsersChanged();
       },
 
       error: (error) => {

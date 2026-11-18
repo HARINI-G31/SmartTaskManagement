@@ -1,7 +1,8 @@
 
 import { Component, inject } from '@angular/core';
-import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { UserRole, CreateUser, UserResponse } from '../../models/user';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { UserRole, CreateUser } from '../../models/user';
+import { AuthService } from '../../services/auth';
 import { UserService } from '../../services/user';
 
 @Component({
@@ -13,10 +14,11 @@ import { UserService } from '../../services/user';
 })
 export class UserCreate {
 
-  private fb = inject(FormBuilder);
-  private userService = inject(UserService);
+  private readonly fb = inject(FormBuilder);
+  private readonly authService = inject(AuthService);
+  private readonly userService = inject(UserService);
 
-  UserRole = UserRole;
+  readonly UserRole = UserRole;
 
   isSubmitting = false;
   successMessage = '';
@@ -26,6 +28,7 @@ export class UserCreate {
     firstName: ['', [Validators.required, Validators.maxLength(100)]],
     lastName: ['', [Validators.required, Validators.maxLength(100)]],
     email: ['', [Validators.required, Validators.email, Validators.maxLength(255)]],
+    password: ['', [Validators.required, Validators.minLength(8)]],
     role: [UserRole.Employee, Validators.required]
   });
 
@@ -45,25 +48,30 @@ export class UserCreate {
       firstName: formValue.firstName.trim(),
       lastName: formValue.lastName.trim(),
       email: formValue.email.trim(),
+      password: formValue.password,
       role: Number(formValue.role) as UserRole
     };
 
     this.isSubmitting = true;
 
     this.userService.createUser(request).subscribe({
-      next: (response: UserResponse) => {
+      next: response => {
         this.successMessage = `User ${response.firstName} registered successfully!`;
+        this.userService.notifyUsersChanged();
         this.userForm.reset({
           firstName: '',
           lastName: '',
           email: '',
+          password: '',
           role: UserRole.Employee
         });
         this.isSubmitting = false;
       },
       error: (error) => {
-        this.errorMessage =
-          error.error?.message || 'Unable to register user. Please try again.';
+        this.errorMessage = this.authService.getErrorMessage(
+          error,
+          'Unable to register user. Please try again.'
+        );
         this.isSubmitting = false;
       }
     });

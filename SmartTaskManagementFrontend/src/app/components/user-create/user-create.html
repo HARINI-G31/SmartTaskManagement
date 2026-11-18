@@ -1,116 +1,93 @@
-
-<div class="page-container">
+<section class="create-page">
+  <div class="page-intro">
+    <div>
+      <p class="eyebrow">PEOPLE &amp; ACCESS</p>
+      <h2>Create Employee</h2>
+      <p>Add a user account to the SmartTaskManagement directory.</p>
+    </div>
+  </div>
 
   <div class="form-card">
-
-    <div class="form-header">
-      <h1>Smart Task Management</h1>
-      <p>Create a new user account</p>
+    <div class="form-heading">
+      <div class="form-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a6 6 0 0 1 12 0v2m5-13v8m4-4h-8"/></svg>
+      </div>
+      <div><h3>Account details</h3><p>Enter the employee's profile and sign-in information.</p></div>
     </div>
 
-    <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+    @if (successMessage) {
+      <div class="notice notice-success" role="status">{{ successMessage }}</div>
+    }
+    @if (errorMessage) {
+      <div class="notice notice-error" role="alert">{{ errorMessage }}</div>
+    }
 
-      <!-- First Name -->
-      <div class="form-group">
-        <label for="firstName">First Name</label>
-
-        <input
-          id="firstName"
-          type="text"
-          formControlName="firstName"
-          placeholder="Enter first name"
-        />
-
-        @if (userForm.controls.firstName.touched &&
-             userForm.controls.firstName.hasError('required')) {
-          <small class="error-text">First name is required.</small>
-        }
-
-        @if (userForm.controls.firstName.touched &&
-             userForm.controls.firstName.hasError('maxlength')) {
-          <small class="error-text">Maximum 100 characters allowed.</small>
-        }
-      </div>
-
-      <!-- Last Name -->
-      <div class="form-group">
-        <label for="lastName">Last Name</label>
-
-        <input
-          id="lastName"
-          type="text"
-          formControlName="lastName"
-          placeholder="Enter last name"
-        />
-
-        @if (userForm.controls.lastName.touched &&
-             userForm.controls.lastName.hasError('required')) {
-          <small class="error-text">Last name is required.</small>
-        }
-
-        @if (userForm.controls.lastName.touched &&
-             userForm.controls.lastName.hasError('maxlength')) {
-          <small class="error-text">Maximum 100 characters allowed.</small>
-        }
-      </div>
-
-      <!-- Email -->
-      <div class="form-group">
-        <label for="email">Email Address</label>
-
-        <input
-          id="email"
-          type="email"
-          formControlName="email"
-          placeholder="Enter email address"
-        />
-
-        @if (userForm.controls.email.touched &&
-             userForm.controls.email.hasError('required')) {
-          <small class="error-text">Email is required.</small>
-        }
-
-        @if (userForm.controls.email.touched &&
-             userForm.controls.email.hasError('email')) {
-          <small class="error-text">Enter a valid email address.</small>
-        }
-
-        @if (userForm.controls.email.touched &&
-             userForm.controls.email.hasError('maxlength')) {
-          <small class="error-text">Maximum 255 characters allowed.</small>
-        }
-      </div>
-
-      <!-- Role -->
-      <div class="form-group">
-        <label for="role">User Role</label>
-
-        <select id="role" formControlName="role">
-          <option [ngValue]="UserRole.Admin">Admin</option>
-          <option [ngValue]="UserRole.Manager">Manager</option>
-          <option [ngValue]="UserRole.Employee">Employee</option>
-        </select>
-      </div>
-
-      <!-- Success Message -->
-      @if (successMessage) {
-        <div class="success-message">
-          {{ successMessage }}
+    <form [formGroup]="userForm" (ngSubmit)="onSubmit()" novalidate>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="firstName">First Name</label>
+          <input id="firstName" type="text" formControlName="firstName" autocomplete="given-name" placeholder="Enter first name" />
+          @if (userForm.controls.firstName.touched && userForm.controls.firstName.hasError('required')) {
+            <small class="error-text">First name is required.</small>
+          } @else if (userForm.controls.firstName.touched && userForm.controls.firstName.hasError('maxlength')) {
+            <small class="error-text">Maximum 100 characters allowed.</small>
+          }
         </div>
-      }
 
-      <!-- Error Message -->
-      @if (errorMessage) {
-        <div class="error-message">
-          {{ errorMessage }}
+        <div class="form-group">
+          <label for="lastName">Last Name</label>
+          <input id="lastName" type="text" formControlName="lastName" autocomplete="family-name" placeholder="Enter last name" />
+          @if (userForm.controls.lastName.touched && userForm.controls.lastName.hasError('required')) {
+            <small class="error-text">Last name is required.</small>
+          } @else if (userForm.controls.lastName.touched && userForm.controls.lastName.hasError('maxlength')) {
+            <small class="error-text">Maximum 100 characters allowed.</small>
+          }
         </div>
-      }
 
-      <!-- Submit Button -->
-      <button type="submit" [disabled]="isSubmitting">
-        {{ isSubmitting ? 'Registering...' : 'Register User' }}
-      </button>
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input id="email" type="email" formControlName="email" autocomplete="email" placeholder="name@example.com" />
+          @if (userForm.controls.email.touched && userForm.controls.email.hasError('required')) {
+            <small class="error-text">Email is required.</small>
+          } @else if (userForm.controls.email.touched && userForm.controls.email.hasError('email')) {
+            <small class="error-text">Enter a valid email address.</small>
+          } @else if (userForm.controls.email.touched && userForm.controls.email.hasError('maxlength')) {
+            <small class="error-text">Maximum 255 characters allowed.</small>
+          }
+        </div>
 
+        <div class="form-group">
+          <label for="role">User Role</label>
+          <select id="role" formControlName="role">
+            <option [ngValue]="UserRole.Admin">Admin</option>
+            <option [ngValue]="UserRole.Manager">Manager</option>
+            <option [ngValue]="UserRole.Employee">Employee</option>
+          </select>
+        </div>
+
+        <div class="form-group full-width">
+          <label for="password">Initial Password</label>
+          <input id="password" type="password" formControlName="password" autocomplete="new-password" placeholder="At least 8 characters" />
+          <small class="field-help">Share this password securely with the new account holder.</small>
+          @if (userForm.controls.password.touched && userForm.controls.password.hasError('required')) {
+            <small class="error-text">An initial password is required.</small>
+          } @else if (userForm.controls.password.touched && userForm.controls.password.hasError('minlength')) {
+            <small class="error-text">Password must be at least 8 characters.</small>
+          }
+        </div>
+      </div>
+
+      <div class="form-footer">
+        <span class="required-note">All fields are required</span>
+        <button class="submit-button" type="submit" [disabled]="isSubmitting">
+          @if (isSubmitting) {
+            <span class="spinner" aria-hidden="true"></span>
+            Creating account...
+          } @else {
+            Create account
+          }
+        </button>
+      </div>
     </form>
   </div>
-</div>
+</section>

@@ -1,75 +1,133 @@
+<section class="page-intro">
+  <div>
+    <p class="eyebrow">PEOPLE &amp; ACCESS</p>
+    <h2>Employee Management</h2>
+    <p>Browse employee accounts, filter by role, or update an account.</p>
+  </div>
+  <a class="button button-primary" routerLink="/user-create">
+    <span aria-hidden="true">+</span>
+    Create employee
+  </a>
+</section>
 
-<div class="user-container">
+<section class="directory-card" aria-label="Employee directory">
+  <div class="directory-toolbar">
+    <div class="count-summary">
+      <strong>{{ users.length }}</strong>
+      <span>{{ users.length === 1 ? 'account' : 'accounts' }} in directory</span>
+    </div>
+    <div class="filters">
+      <label class="search-field">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+        <input
+          type="search"
+          [ngModel]="searchTerm"
+          (ngModelChange)="onSearchChange($event)"
+          placeholder="Search ID, name, or email"
+          aria-label="Search by employee ID, first name, last name, or email"
+        />
+      </label>
+      <label class="role-select">
+        <span class="sr-only">Filter by role</span>
+        <select [value]="roleFilter" (change)="onRoleFilterChange($event)" aria-label="Filter by role">
+          <option value="all">All roles</option>
+          <option [value]="UserRole.Employee">Employee</option>
+          <option [value]="UserRole.Manager">Manager</option>
+          <option [value]="UserRole.Admin">Admin</option>
+        </select>
+      </label>
+      <button class="button button-secondary refresh-button" type="button" (click)="loadUsers()" [disabled]="isLoading">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M5.6 9a7 7 0 0 1 11.6-2L20 12M4 12l2.8 5a7 7 0 0 0 11.6-2"/></svg>
+        {{ isLoading ? 'Loading...' : 'Refresh' }}
+      </button>
+    </div>
+  </div>
 
-  <h2>Registered Users</h2>
-
-  <button type="button" (click)="loadUsers()">
-    Refresh Users
-  </button>
+  @if (successMessage) {
+    <p class="notice notice-success" role="status">{{ successMessage }}</p>
+  }
+  @if (errorMessage) {
+    <div class="notice notice-error" role="alert">
+      <span>{{ errorMessage }}</span>
+      <button class="button button-secondary" type="button" (click)="loadUsers()">Try again</button>
+    </div>
+  }
 
   @if (isLoading) {
-    <p>Loading users...</p>
-  }
-
-  @else if (errorMessage) {
-    <p class="error">{{ errorMessage }}</p>
-  }
-
-  @else {
-    <h3>Total Users: {{ users.length }}</h3>
-
-    <div class="search-controls">
-      <input
-        type="search"
-        [value]="searchTerm"
-        (input)="onSearchInput($event)"
-        placeholder="Search by Employee ID or Email"
-        aria-label="Search by Employee ID or Email"
-      />
-      @if (searchTerm) {
-        <button type="button" class="clear-search" (click)="clearSearch()">
-          Clear search
-        </button>
+    <div class="state-panel" role="status">
+      <span class="spinner" aria-hidden="true"></span>
+      <span>Loading employee records...</span>
+    </div>
+  } @else if (!errorMessage && filteredUsers.length === 0) {
+    <div class="state-panel empty-state">
+      <div class="empty-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+      </div>
+      @if (users.length === 0) {
+        <h3>No employee accounts yet</h3>
+        <p>Create an account to see it in the directory.</p>
+        <a class="button button-primary" routerLink="/user-create">Create employee</a>
+      } @else {
+        <h3>No matching employees</h3>
+        <p>Try changing your search or role filter.</p>
+        <button class="button button-secondary" type="button" (click)="clearFilters()">Clear filters</button>
       }
     </div>
-
-    @if (filteredUsers.length > 0) {
+  } @else if (!errorMessage) {
+    <div class="table-wrap">
       <table>
         <thead>
           <tr>
-            <th>S.No</th>
-            <th>Employee ID</th>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Email</th>
-            <th>Role</th>
+            <th scope="col">S.No</th>
+            <th scope="col">Employee ID</th>
+            <th scope="col">First Name</th>
+            <th scope="col">Last Name</th>
+            <th scope="col">Email</th>
+            <th scope="col">Role</th>
+            <th scope="col">Actions</th>
           </tr>
         </thead>
-
         <tbody>
-          @for (user of filteredUsers; track user.id; let i = $index) {
+          @for (user of pagedUsers; track user.id; let i = $index) {
             <tr>
-              <td>{{ i + 1 }}</td>
-              <td>{{ user.id }}</td>
+              <td class="serial">{{ (currentPage - 1) * pageSize + i + 1 }}</td>
+              <td class="employee-id">{{ user.id }}</td>
               <td>{{ user.firstName }}</td>
               <td>{{ user.lastName }}</td>
-              <td>{{ user.email }}</td>
+              <td class="email-cell">{{ user.email }}</td>
+              <td><span class="role-pill" [class]="
+                user.role === UserRole.Admin ? 'role-pill admin' :
+                user.role === UserRole.Manager ? 'role-pill manager' : 'role-pill employee'
+              ">{{ roleName(user.role) }}</span></td>
               <td>
-                @switch (user.role) {
-                  @case (0) { Admin }
-                  @case (1) { Manager }
-                  @case (2) { Employee }
-                  @default { Unknown }
-                }
+                <div class="row-actions">
+                  <a
+                    class="action-link"
+                    [routerLink]="['/user-update']"
+                    [queryParams]="{ userId: user.id }"
+                    [attr.aria-label]="'Edit ' + user.firstName + ' ' + user.lastName"
+                  >Edit</a>
+                  <button
+                    class="action-link delete-action"
+                    type="button"
+                    [disabled]="deletingUserId === user.id"
+                    (click)="deleteUser(user)"
+                    [attr.aria-label]="'Delete ' + user.firstName + ' ' + user.lastName"
+                  >{{ deletingUserId === user.id ? 'Deleting...' : 'Delete' }}</button>
+                </div>
               </td>
             </tr>
           }
         </tbody>
       </table>
-    }
-    @else {
-      <p>No employees found</p>
-    }
+    </div>
+    <footer class="pagination">
+      <span>Showing {{ (currentPage - 1) * pageSize + 1 }}–{{ (currentPage - 1) * pageSize + pagedUsers.length }} of {{ filteredUsers.length }}</span>
+      <div class="pagination-actions">
+        <button class="button button-secondary" type="button" (click)="previousPage()" [disabled]="currentPage === 1">Previous</button>
+        <span>Page {{ currentPage }} of {{ totalPages }}</span>
+        <button class="button button-secondary" type="button" (click)="nextPage()" [disabled]="currentPage === totalPages">Next</button>
+      </div>
+    </footer>
   }
-
-</div>
+</section>

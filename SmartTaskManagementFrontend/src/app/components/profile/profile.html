@@ -1,0 +1,41 @@
+<section class="profile-page">
+  <div class="page-intro">
+    <div>
+      <p class="eyebrow">ACCOUNT</p>
+      <h2>Profile</h2>
+      <p>Your account information and access role.</p>
+    </div>
+    <button class="button button-secondary" type="button" (click)="loadProfile()" [disabled]="isLoading">
+      {{ isLoading ? 'Refreshing...' : 'Refresh profile' }}
+    </button>
+  </div>
+
+  @if (isLoading) {
+    <div class="profile-card state-panel" role="status">
+      <span class="spinner" aria-hidden="true"></span>
+      Loading your profile...
+    </div>
+  } @else if (errorMessage) {
+    <div class="profile-card error-state" role="alert">
+      <p>{{ errorMessage }}</p>
+      <button class="button button-secondary" type="button" (click)="loadProfile()">Try again</button>
+    </div>
+  } @else if (user) {
+    <article class="profile-card">
+      <div class="profile-header">
+        <div class="profile-avatar" aria-hidden="true">{{ user.firstName.charAt(0) }}{{ user.lastName.charAt(0) }}</div>
+        <div>
+          <h3>{{ user.firstName }} {{ user.lastName }}</h3>
+          <span class="role-badge">{{ roleName(user.role) }}</span>
+        </div>
+      </div>
+      <dl class="profile-details">
+        <div><dt>First Name</dt><dd>{{ user.firstName }}</dd></div>
+        <div><dt>Last Name</dt><dd>{{ user.lastName }}</dd></div>
+        <div><dt>Email</dt><dd>{{ user.email }}</dd></div>
+        <div><dt>Employee ID</dt><dd class="employee-id">{{ user.id }}</dd></div>
+        <div><dt>Role</dt><dd>{{ roleName(user.role) }}</dd></div>
+      </dl>
+    </article>
+  }
+</section>

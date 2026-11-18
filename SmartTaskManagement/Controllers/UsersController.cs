@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SmartTaskManagement.DTOs.User;
@@ -9,7 +10,7 @@ namespace SmartTaskManagement.Controllers;
 [Route("api/[controller]")]
 public class UsersController(IUserService userService) : ControllerBase
 {
-    [Authorize(Roles = "Admin,Manager,Employee")]
+    [Authorize(Roles = "Admin")]
     [HttpGet]
     public async Task<ActionResult<IReadOnlyCollection<UserResponseDto>>> GetAll(CancellationToken cancellationToken)
     {
@@ -17,7 +18,20 @@ public class UsersController(IUserService userService) : ControllerBase
         return Ok(users);
     }
 
-    [Authorize(Roles = "Admin,Manager,Employee")]
+    [Authorize]
+    [HttpGet("me")]
+    public async Task<ActionResult<UserResponseDto>> GetCurrent(CancellationToken cancellationToken)
+    {
+        if (!Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
+        {
+            return Unauthorized();
+        }
+
+        var user = await userService.GetByIdAsync(userId, cancellationToken);
+        return user is null ? NotFound() : Ok(user);
+    }
+
+    [Authorize(Roles = "Admin")]
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<UserResponseDto>> GetById(Guid id, CancellationToken cancellationToken)
     {

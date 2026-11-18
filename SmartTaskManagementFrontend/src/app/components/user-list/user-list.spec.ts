@@ -1,8 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 
 import { UserList } from './user-list';
-import { UserResponse } from '../../models/user';
+import { UserResponse, UserRole } from '../../models/user';
+import { AuthService } from '../../services/auth';
 import { UserService } from '../../services/user';
 
 describe('UserList', () => {
@@ -34,12 +36,28 @@ describe('UserList', () => {
     await TestBed.configureTestingModule({
       imports: [UserList],
       providers: [
-        { provide: UserService, useValue: { getUsers: () => of(users) } }
+        provideRouter([]),
+        {
+          provide: AuthService,
+          useValue: {
+            getErrorMessage: (_error: unknown, fallback: string) => fallback
+          }
+        },
+        {
+          provide: UserService,
+          useValue: {
+            getUsers: () => of(users),
+            usersChanged$: of(),
+            deleteUser: () => of(undefined),
+            notifyUsersChanged: () => undefined
+          }
+        }
       ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(UserList);
     component = fixture.componentInstance;
+    fixture.detectChanges();
     await fixture.whenStable();
   });
 
@@ -47,31 +65,36 @@ describe('UserList', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should match employee IDs and emails without searching names', () => {
-    component.searchTerm = 'EMPLOYEE-001';
-    expect(component.filteredUsers.map(user => user.id)).toEqual(['employee-001']);
-
-    component.searchTerm = 'JAMIE@EXAMPLE.COM';
-    expect(component.filteredUsers.map(user => user.id)).toEqual(['employee-002']);
-
-    component.searchTerm = 'Morgan';
-    expect(component.filteredUsers).toEqual([]);
+  it('searches by employee ID, first name, last name, and email', () => {
+    for (const query of ['EMPLOYEE-001', 'Alex', 'Morgan', 'ALEX@EXAMPLE.COM']) {
+      component.onSearchChange(query);
+      expect(component.filteredUsers.map(user => user.id)).toEqual(['employee-001']);
+    }
   });
 
-  it('should show no-match feedback and restore results when search is cleared', () => {
-    const input = fixture.nativeElement.querySelector('input') as HTMLInputElement;
-    input.value = 'missing@example.com';
-    input.dispatchEvent(new Event('input'));
-    fixture.detectChanges();
+  it('filters by role and resets the current page when filters change', () => {
+    component.onRoleFilterChange({
+      target: { value: String(UserRole.Employee) }
+    } as unknown as Event);
 
-    expect(fixture.nativeElement.textContent).toContain('No employees found');
-    expect(fixture.nativeElement.querySelectorAll('tbody tr').length).toBe(0);
+    expect(component.filteredUsers.map(user => user.role)).toEqual([UserRole.Employee, UserRole.Employee]);
+    component.currentPage = 3;
+    component.onSearchChange('Alex');
+    expect(component.currentPage).toBe(1);
+  });
 
-    const clearButton = fixture.nativeElement.querySelector('.clear-search') as HTMLButtonElement;
-    clearButton.click();
-    fixture.detectChanges();
+  it('paginates filtered directory results', () => {
+    component.users = Array.from({ length: 12 }, (_, index) => ({
+      ...users[0],
+      id: `page-${index + 1}`
+    }));
 
-    expect(fixture.nativeElement.textContent).not.toContain('No employees found');
-    expect(fixture.nativeElement.querySelectorAll('tbody tr').length).toBe(2);
+    expect(component.totalPages).toBe(2);
+    expect(component.pagedUsers).toHaveLength(10);
+    component.nextPage();
+    expect(component.currentPage).toBe(2);
+    expect(component.pagedUsers).toHaveLength(2);
+    component.previousPage();
+    expect(component.currentPage).toBe(1);
   });
 });

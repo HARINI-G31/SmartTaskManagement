@@ -1,6 +1,6 @@
-import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnInit, inject } from '@angular/core';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 
 import { UserResponse, UserRole } from '../../models/user';
 import { AuthService } from '../../services/auth';
@@ -14,8 +14,8 @@ import { UserService } from '../../services/user';
   styleUrl: './dashboard.css'
 })
 export class Dashboard implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
   private readonly authService = inject(AuthService);
-  private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly userService = inject(UserService);
 
@@ -27,8 +27,9 @@ export class Dashboard implements OnInit {
   readonly UserRole = UserRole;
 
   users: UserResponse[] = [];
-  isLoading = true;
+  isLoading = false;
   errorMessage = '';
+  hasLoaded = false;
 
   get totalEmployees(): number {
     return this.users.length;
@@ -47,6 +48,15 @@ export class Dashboard implements OnInit {
   }
 
   ngOnInit(): void {
+    if (this.user?.role === UserRole.Admin) {
+      this.loadEmployees();
+      this.userService.usersChanged$
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe(() => this.loadEmployees());
+    }
+  }
+
+  refresh(): void {
     this.loadEmployees();
   }
 
@@ -58,17 +68,16 @@ export class Dashboard implements OnInit {
       next: users => {
         this.users = users;
         this.isLoading = false;
+        this.hasLoaded = true;
       },
-      error: (error: HttpErrorResponse) => {
-        console.error('Unable to load dashboard employees:', error);
-        this.errorMessage = 'Unable to load dashboard statistics. Please try again.';
+      error: error => {
+        this.errorMessage = this.authService.getErrorMessage(
+          error,
+          'Unable to load dashboard statistics. Please try again.'
+        );
         this.isLoading = false;
+        this.hasLoaded = true;
       }
     });
-  }
-
-  logout(): void {
-    this.authService.logout();
-    void this.router.navigate(['/login']);
   }
 }

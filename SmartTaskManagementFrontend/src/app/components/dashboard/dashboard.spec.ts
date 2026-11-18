@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, provideRouter } from '@angular/router';
-import { of } from 'rxjs';
+import { Subject, of } from 'rxjs';
 
 import { UserResponse, UserRole } from '../../models/user';
 import { AuthService } from '../../services/auth';
@@ -9,6 +9,7 @@ import { Dashboard } from './dashboard';
 
 describe('Dashboard', () => {
   let fixture: ComponentFixture<Dashboard>;
+  let getUsers: ReturnType<typeof vi.fn>;
 
   const users: UserResponse[] = [
     {
@@ -41,6 +42,7 @@ describe('Dashboard', () => {
   ];
 
   beforeEach(async () => {
+    getUsers = vi.fn(() => of(users));
     await TestBed.configureTestingModule({
       imports: [Dashboard],
       providers: [
@@ -58,11 +60,13 @@ describe('Dashboard', () => {
               lastName: 'Admin',
               email: 'ada@example.com',
               role: UserRole.Admin
-            }),
-            logout: () => undefined
+            })
           }
         },
-        { provide: UserService, useValue: { getUsers: () => of(users) } }
+        {
+          provide: UserService,
+          useValue: { getUsers, usersChanged$: new Subject<void>() }
+        }
       ]
     }).compileComponents();
 
@@ -75,11 +79,15 @@ describe('Dashboard', () => {
   it('should render admin dashboard statistics from the users API', () => {
     const element = fixture.nativeElement as HTMLElement;
 
-    expect(element.querySelector('h1')?.textContent).toContain('Admin Dashboard');
+    expect(element.querySelector('h2')?.textContent).toContain('Workforce overview');
     expect(element.textContent).toContain('Welcome, Ada Admin');
     expect(Array.from(element.querySelectorAll('.stat-card strong')).map(node => node.textContent?.trim()))
       .toEqual(['3', '1', '1', '1']);
-    expect(element.querySelector('a[routerLink="/user-create"]')).toBeTruthy();
-    expect(element.querySelector('a[routerLink="/users"]')).toBeTruthy();
+    expect(element.querySelector('a[routerLink="/employees"]')).toBeTruthy();
+  });
+
+  it('should refresh live statistics when requested', () => {
+    fixture.componentInstance.refresh();
+    expect(getUsers).toHaveBeenCalledTimes(2);
   });
 });
