@@ -64,6 +64,58 @@ namespace SmartTaskManagement.API.Services
 
             return await _projectRepository.GetPagedAsync(pageNumber, pageSize);
         }
+        public async Task<(List<Project> Projects, int TotalCount)> SearchProjectsAsync(
+    string searchTerm,
+    int pageNumber,
+    int pageSize)
+        {
+            if (pageNumber < 1)
+            {
+                throw new ArgumentException("Page number must be greater than zero.");
+            }
+
+            if (pageSize < 1 || pageSize > 100)
+            {
+                throw new ArgumentException("Page size must be between 1 and 100.");
+            }
+
+            if (string.IsNullOrWhiteSpace(searchTerm))
+            {
+                throw new ArgumentException("Search term is required.");
+            }
+
+            return await _projectRepository.SearchAsync(
+                searchTerm.Trim(),
+                pageNumber,
+                pageSize
+            );
+        }
+        public async Task<(List<Project> Projects, int TotalCount)> FilterProjectsByStatusAsync(
+    int status,
+    int pageNumber,
+    int pageSize)
+        {
+            if (status < 1 || status > 5)
+            {
+                throw new ArgumentException("Invalid project status.");
+            }
+
+            if (pageNumber < 1)
+            {
+                throw new ArgumentException("Page number must be greater than zero.");
+            }
+
+            if (pageSize < 1 || pageSize > 100)
+            {
+                throw new ArgumentException("Page size must be between 1 and 100.");
+            }
+
+            return await _projectRepository.FilterByStatusAsync(
+                status,
+                pageNumber,
+                pageSize
+            );
+        }
         public async Task<Project?> GetProjectByIdAsync(int projectId)
         {
             if (projectId <= 0)

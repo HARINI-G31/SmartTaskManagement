@@ -44,6 +44,50 @@ namespace SmartTaskManagement.API.Repositories
 
             return (projects, totalCount);
         }
+        public async Task<(List<Project> Projects, int TotalCount)> SearchAsync(
+    string searchTerm,
+    int pageNumber,
+    int pageSize)
+        {
+            var query = _context.Projects.AsNoTracking();
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                query = query.Where(p =>
+                    p.ProjectName.Contains(searchTerm) ||
+                    (p.Description != null && p.Description.Contains(searchTerm))
+                );
+            }
+
+            var totalCount = await query.CountAsync();
+
+            var projects = await query
+                .OrderBy(p => p.ProjectId)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (projects, totalCount);
+        }
+        public async Task<(List<Project> Projects, int TotalCount)> FilterByStatusAsync(
+    int status,
+    int pageNumber,
+    int pageSize)
+        {
+            var query = _context.Projects
+                .AsNoTracking()
+                .Where(p => (int)p.Status == status);
+
+            var totalCount = await query.CountAsync();
+
+            var projects = await query
+                .OrderBy(p => p.ProjectId)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (projects, totalCount);
+        }
         public async Task<Project?> GetByIdAsync(int projectId)
         {
             return await _context.Projects

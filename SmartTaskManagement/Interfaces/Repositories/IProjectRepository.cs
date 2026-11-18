@@ -12,6 +12,16 @@ namespace SmartTaskManagement.API.Interfaces.Repositories
     int pageNumber,
     int pageSize
 );
+        Task<(List<Project> Projects, int TotalCount)> SearchAsync(
+    string searchTerm,
+    int pageNumber,
+    int pageSize
+);
+        Task<(List<Project> Projects, int TotalCount)> FilterByStatusAsync(
+    int status,
+    int pageNumber,
+    int pageSize
+);
         Task<Project?> GetByIdAsync(int projectId);
         Task<Project> UpdateAsync(Project project);
         Task DeleteAsync(Project project);

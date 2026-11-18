@@ -4,7 +4,26 @@
       <h1>All Projects</h1>
       <p>View and manage all your projects.</p>
     </div>
+    <div class="search-container">
+      <select [(ngModel)]="selectedStatus" (change)="filterByStatus()">
+        <option value="">All Status</option>
+        <option value="1">Planning</option>
+        <option value="2">In Progress</option>
+        <option value="3">On Hold</option>
+        <option value="4">Completed</option>
+        <option value="5">Cancelled</option>
+      </select>
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        placeholder="Search by project name or description"
+        (keyup.enter)="searchProjects()"
+      />
 
+      <button type="button" (click)="searchProjects()">Search</button>
+
+      <button type="button" (click)="clearSearch()">Clear</button>
+    </div>
     <a routerLink="/projects/create" class="create-button"> + Create Project </a>
   </div>
 

@@ -48,6 +48,24 @@ export class ProjectService {
       `${this.apiUrl}/paginated?pageNumber=${pageNumber}&pageSize=${pageSize}`,
     );
   }
+  searchProjects(
+    searchTerm: string,
+    pageNumber: number,
+    pageSize: number,
+  ): Observable<PaginatedProjects> {
+    return this.http.get<PaginatedProjects>(
+      `${this.apiUrl}/search?searchTerm=${encodeURIComponent(searchTerm)}&pageNumber=${pageNumber}&pageSize=${pageSize}`,
+    );
+  }
+  filterProjectsByStatus(
+    status: number,
+    pageNumber: number,
+    pageSize: number,
+  ): Observable<PaginatedProjects> {
+    return this.http.get<PaginatedProjects>(
+      `${this.apiUrl}/filter-by-status?status=${status}&pageNumber=${pageNumber}&pageSize=${pageSize}`,
+    );
+  }
   getProjectById(projectId: number): Observable<Project> {
     return this.http.get<Project>(`${this.apiUrl}/${projectId}`);
   }
