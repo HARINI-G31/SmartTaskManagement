@@ -1,0 +1,59 @@
+<div class="register-container">
+  <div class="register-card">
+    <h1>Create Account</h1>
+    <p>Register to start managing your tasks.</p>
+
+    <form [formGroup]="registerForm" (ngSubmit)="submit()">
+      <label for="email">Email</label>
+      <input
+        id="email"
+        type="email"
+        formControlName="email"
+        placeholder="Enter your email"
+      />
+
+      @if (registerForm.controls.email.touched &&
+           registerForm.controls.email.invalid) {
+        <small>Enter a valid email address.</small>
+      }
+
+      <label for="password">Password</label>
+      <input
+        id="password"
+        type="password"
+        formControlName="password"
+        placeholder="Minimum 8 characters"
+      />
+
+      @if (registerForm.controls.password.touched &&
+           registerForm.controls.password.invalid) {
+        <small>Password must contain at least 8 characters.</small>
+      }
+
+      <label for="confirmPassword">Confirm Password</label>
+      <input
+        id="confirmPassword"
+        type="password"
+        formControlName="confirmPassword"
+        placeholder="Re-enter your password"
+      />
+
+      @if (errorMessage) {
+        <div class="error-message">{{ errorMessage }}</div>
+      }
+
+      @if (successMessage) {
+        <div class="success-message">{{ successMessage }}</div>
+      }
+
+      <button type="submit" [disabled]="isLoading">
+        {{ isLoading ? 'Creating Account...' : 'Register' }}
+      </button>
+    </form>
+
+    <div class="login-link">
+      Already have an account?
+      <a href="/login">Login</a>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,65 @@
+<div class="login-container">
+  <div class="login-card">
+    <h1>Smart Task Management</h1>
+    <p>Login to manage your tasks</p>
+
+    <form [formGroup]="loginForm" (ngSubmit)="submit()">
+      <label for="email">Email</label>
+      <input
+        id="email"
+        type="email"
+        formControlName="email"
+        placeholder="Enter your registered email"
+      />
+
+      @if (loginForm.controls.email.touched && loginForm.controls.email.invalid) {
+        <small class="field-error">Enter a valid email address.</small>
+      }
+
+      <label for="password">Password</label>
+
+      <div class="password-wrapper">
+        <input
+          id="password"
+          [type]="showPassword ? 'text' : 'password'"
+          formControlName="password"
+          placeholder="Enter your password"
+        />
+
+        <button
+          type="button"
+          class="eye-button"
+          (click)="togglePassword()"
+          [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
+        >
+          {{ showPassword ? 'Hide' : 'Show' }}
+        </button>
+      </div>
+
+      @if (loginForm.controls.password.touched && loginForm.controls.password.invalid) {
+        <small class="field-error">Password is required.</small>
+      }
+
+      <div class="forgot-row">
+        <button type="button" class="forgot-link" (click)="forgotPassword()">
+          Forgot Password?
+        </button>
+      </div>
+
+      @if (forgotPasswordMessage) {
+        <div class="info-message">{{ forgotPasswordMessage }}</div>
+      }
+
+      @if (errorMessage) {
+        <div class="error-message">
+          <strong>Login failed</strong>
+          {{ errorMessage }}
+        </div>
+      }
+
+      <button type="submit" class="login-button" [disabled]="isLoading">
+        {{ isLoading ? 'Logging in...' : 'Login' }}
+      </button>
+    </form>
+  </div>
+</div>
