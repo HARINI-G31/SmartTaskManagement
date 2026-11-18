@@ -1,0 +1,119 @@
+<div class="page-container">
+  <div class="page-header">
+    <div>
+      <h1>All Projects</h1>
+      <p>View and manage all your projects.</p>
+    </div>
+    <div class="search-container">
+      <select [(ngModel)]="selectedStatus" (change)="filterByStatus()">
+        <option value="">All Status</option>
+        <option value="1">Planning</option>
+        <option value="2">In Progress</option>
+        <option value="3">On Hold</option>
+        <option value="4">Completed</option>
+        <option value="5">Cancelled</option>
+      </select>
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        placeholder="Search by project name or description"
+        (keyup.enter)="searchProjects()"
+      />
+
+      <button type="button" (click)="searchProjects()">Search</button>
+
+      <button type="button" (click)="clearSearch()">Clear</button>
+    </div>
+    <a routerLink="/projects/create" class="create-button"> + Create Project </a>
+  </div>
+
+  <div *ngIf="isLoading" class="loading">Loading projects...</div>
+
+  <div *ngIf="errorMessage" class="error-message">
+    {{ errorMessage }}
+  </div>
+
+  <div *ngIf="!isLoading && !errorMessage" class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Project Name</th>
+          <th>Description</th>
+          <th>Start Date</th>
+          <th>End Date</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let project of projects">
+          <td>{{ project.projectId }}</td>
+          <td>{{ project.projectName }}</td>
+          <td>{{ project.description || 'N/A' }}</td>
+          <td>{{ project.startDate | date: 'dd-MM-yyyy' }}</td>
+          <td>{{ project.endDate | date: 'dd-MM-yyyy' }}</td>
+
+          <td>
+            <span class="status">
+              {{
+                project.status === 1
+                  ? 'Planning'
+                  : project.status === 2
+                    ? 'In Progress'
+                    : project.status === 3
+                      ? 'On Hold'
+                      : project.status === 4
+                        ? 'Completed'
+                        : 'Cancelled'
+              }}
+            </span>
+          </td>
+
+          <td>
+            <div class="action-buttons">
+              <a [routerLink]="['/projects', project.projectId]" class="action-btn view-btn">
+                View Details
+              </a>
+
+              <a [routerLink]="['/projects/edit', project.projectId]" class="action-btn edit-btn">
+                Edit
+              </a>
+
+              <button class="action-btn delete-btn" (click)="deleteProject(project.projectId)">
+                Delete
+              </button>
+            </div>
+          </td>
+        </tr>
+
+        <tr *ngIf="projects.length === 0">
+          <td colspan="7" class="empty-message">No projects found.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Pagination -->
+    <div class="pagination" *ngIf="totalCount > 0">
+      <p class="pagination-info">
+        Showing {{ (pageNumber - 1) * pageSize + 1 }}
+        -
+        {{ (pageNumber - 1) * pageSize + projects.length }}
+        of {{ totalCount }} projects
+      </p>
+
+      <div class="pagination-controls">
+        <button class="page-btn" (click)="previousPage()" [disabled]="pageNumber === 1">
+          Previous
+        </button>
+
+        <span class="page-number">{{ pageNumber }}</span>
+
+        <button class="page-btn" (click)="nextPage()" [disabled]="pageNumber === totalPages">
+          Next
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

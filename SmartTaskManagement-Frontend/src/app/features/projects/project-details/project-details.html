@@ -1,0 +1,57 @@
+<div class="details-container">
+  <a routerLink="/projects" class="back-button">← Back to Projects</a>
+
+  <h1>Project Details</h1>
+
+  <p *ngIf="isLoading">Loading project details...</p>
+
+  <p *ngIf="errorMessage" class="error">
+    {{ errorMessage }}
+  </p>
+
+  <div *ngIf="project as p" class="details-card">
+    <h2>{{ p.projectName }}</h2>
+
+    <div class="detail-row">
+      <strong>Project ID:</strong>
+      <span>{{ p.projectId }}</span>
+    </div>
+
+    <div class="detail-row">
+      <strong>Description:</strong>
+      <span>{{ p.description || 'N/A' }}</span>
+    </div>
+
+    <div class="detail-row">
+      <strong>Start Date:</strong>
+      <span>{{ p.startDate | date: 'dd-MM-yyyy' }}</span>
+    </div>
+
+    <div class="detail-row">
+      <strong>End Date:</strong>
+      <span>{{ p.endDate | date: 'dd-MM-yyyy' }}</span>
+    </div>
+
+    <div class="detail-row">
+      <strong>Status:</strong>
+      <span>
+        {{
+          p.status === 1
+            ? 'Planning'
+            : p.status === 2
+              ? 'In Progress'
+              : p.status === 3
+                ? 'On Hold'
+                : p.status === 4
+                  ? 'Completed'
+                  : 'Cancelled'
+        }}
+      </span>
+    </div>
+
+    <div class="detail-row">
+      <strong>Created At:</strong>
+      <span>{{ p.createdAt | date: 'dd-MM-yyyy HH:mm' }}</span>
+    </div>
+  </div>
+</div>
